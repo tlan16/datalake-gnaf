@@ -1,0 +1,13 @@
+# Editors
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Python
+.venv/
+
+# .dockerignore specifics
+Dockerfile
+docker-compose.yml

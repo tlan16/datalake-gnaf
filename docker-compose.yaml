@@ -1,0 +1,26 @@
+---
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      target: production
+  dev:
+    build:
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - venv:/app/.venv
+      - ./:/app
+  postgres:
+    image: postgis/postgis:16-3.5-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: geoscape
+    volumes:
+      - ./data-sources:/data-sources:ro
+    ports:
+      - "5432:5432"
+
+volumes:
+  venv:
