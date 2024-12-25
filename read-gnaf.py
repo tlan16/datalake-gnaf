@@ -6,7 +6,7 @@ def main():
     data_directory = get_data_directory("address")
     init()
     df = daft.read_deltalake(data_directory)
-    print(f"Loaded data frame from {data_directory}")
+    print(f"Read {df.count_rows()} rows frame from {data_directory}")
     lookup_rea_office(df)
 
 def lookup_rea_office(df: daft.DataFrame):
