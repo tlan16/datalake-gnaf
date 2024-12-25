@@ -1,18 +1,15 @@
-def main():
-    data_directory = get_data_directory("address")
-    init(data_directory)
-    read_address_detail(data_directory)
+import daft
 
-def init(data_directory: str):
-    import daft
-    import os
-    if os.path.exists(data_directory):
-        from shutil import rmtree
-        rmtree(data_directory)
+def main():
+    init()
+    # df = read_address_detail()
+    # persist(df)
+    generate_sample()
+
+def init():
     daft.context.set_runner_native()
 
-def read_address_detail(data_directory: str):
-    import daft
+def read_address_detail() -> daft.DataFrame:
     from daft import DataType
 
     df_address_detail = None
@@ -315,7 +312,7 @@ def read_address_detail(data_directory: str):
     ).exclude("CODE", "NAME", "DESCRIPTION")
 
     print("Joining address view")
-    address_view = df_address_detail.join(
+    address_view: daft.DataFrame = df_address_detail.join(
         df_flat_type_aut,
         on=[daft.col("FLAT_TYPE_CODE")],
         how="left",
@@ -345,14 +342,48 @@ def read_address_detail(data_directory: str):
         how="left",
     )
     address_view.show()
+    return address_view
 
-    print(f"Writing address view to delta lake directory {data_directory}")
-    address_view.write_deltalake(data_directory, mode="overwrite")
-    print(f"Data written to delta lake directory {data_directory}")
+def persist(df: daft.DataFrame):
+    deltalake_directory = get_data_directory("address")
+    csv_directory = get_data_directory("address_csv")
+    for directory in [deltalake_directory, csv_directory]:
+        import os
+        from shutil import rmtree
+        if os.path.exists(directory):
+            rmtree(directory)
 
-def get_data_directory(data_type: str):
+    print(f"Writing deltalake to {deltalake_directory}")
+    df.write_deltalake(get_data_directory("address"))
+    print(f"Writing csv to {csv_directory}")
+    df.write_csv(get_data_directory("address_csv"))
+
+def get_data_directory(data_type: str) -> str:
     import os
     return os.path.join(os.getcwd(), f"data/{data_type}")
+
+def generate_sample():
+    import os
+    import subprocess
+
+    csv_directory = get_data_directory("address_csv")
+    first_file_in_directory = next(os.walk(csv_directory))[2][0]
+    assert first_file_in_directory is not None
+    with open(os.path.join(csv_directory, first_file_in_directory)) as csv_file:
+        from csv2md.table import Table
+        table = Table.parse_csv(csv_file)
+        first_10_rows = "\n".join(table.markdown().splitlines()[:10])
+        with open(os.path.join(csv_directory, 'README.md'), "w") as readme_file:
+            readme_file.writelines([
+                "# Sample of Address Detail csv\n",
+                "\n",
+                first_10_rows,
+                "\n",
+            ])
+    subprocess.call(
+        f"find {csv_directory} -name '*.csv' -type f | parallel --ungroup -- xz --verbose --best {{}}",
+        shell=True
+    )
 
 if __name__ == "__main__":
     main()

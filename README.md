@@ -1,3 +1,11 @@
+# Pre-generated data
+
+Based on Australian government data labeled as Nov. 2024. Sample data is at [data/address_csv/README.md](/data/address_csv/README.md).
+
+The complete data are split into multiple csv files. Each file are xz compressed. All files are under the [data/address_csv](/data/address_csv) folder.
+
+# Generate the data yourself
+
 ## Local step
 
 1. Install `uv` follow [this](https://github.com/astral-sh/uv?tab=readme-ov-file#installation) or simply run `brew install uv`. `uv` managed both python version and dependencies.

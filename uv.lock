@@ -11,10 +11,19 @@ wheels = [
 ]
 
 [[package]]
+name = "csv2md"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/1a/e7c7dd4d33895dec78d8473e36822fd93b4e4bfa5037531faa005a8fec3c/csv2md-1.4.0-py3-none-any.whl", hash = "sha256:0ec88f0d5666ffb460c6b07388f1f87fe4414525e691293bc1a24db70a51698f", size = 6939 },
+]
+
+[[package]]
 name = "data-lake-management-service-slice-leading"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "csv2md" },
     { name = "getdaft", extra = ["deltalake"] },
     { name = "packaging" },
     { name = "pandas" },
@@ -23,6 +32,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "csv2md", specifier = ">=1.4.0" },
     { name = "getdaft", extras = ["deltalake"], specifier = ">=0.3.15" },
     { name = "packaging", specifier = ">=24.2" },
     { name = "pandas", specifier = ">=2.2.3" },
